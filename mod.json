@@ -1,0 +1,38 @@
+{
+	"geode": "5.0.0",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081"
+	},
+	"id": "valenbasiuk.porotos-core",
+	"name": "Porotos 2 Core",
+	"version": "v0.2.0",
+	"developer": "valenbasiuk",
+	"description": "Conecta el juego a Porotos 2 GDPS, oculta los niveles main y manda tus niveles completados al server (también funciona junto a GDPS Switcher).",
+	"settings": {
+		"server-url": {
+			"type": "string",
+			"name": "URL del server",
+			"description": "Base del GDPS, sin barra final.",
+			"default": "https://porotosgdps.ps.fhgdps.com"
+		},
+		"hide-main-levels": {
+			"type": "bool",
+			"name": "Ocultar niveles main",
+			"description": "El boton Play abre los niveles online y se bloquean los main y The Tower.",
+			"default": true
+		},
+		"auto-submit": {
+			"type": "bool",
+			"name": "Enviar completados automaticamente",
+			"description": "Al pasar un nivel online, manda tu puntaje al server para que te cuente las estrellas.",
+			"default": true
+		}
+	},
+	"dependencies": {
+		"km7dev.gdps-switcher": {
+			"version": ">=1.0.0",
+			"importance": "suggested"
+		}
+	}
+}
