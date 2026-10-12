@@ -6,7 +6,7 @@
 	},
 	"id": "valenbasiuk.porotos-core",
 	"name": "Porotos 2 Core",
-	"version": "v0.2.0",
+	"version": "v0.2.1",
 	"developer": "valenbasiuk",
 	"description": "Conecta el juego a Porotos 2 GDPS, oculta los niveles main y manda tus niveles completados al server (también funciona junto a GDPS Switcher).",
 	"settings": {
@@ -27,12 +27,6 @@
 			"name": "Enviar completados automaticamente",
 			"description": "Al pasar un nivel online, manda tu puntaje al server para que te cuente las estrellas.",
 			"default": true
-		}
-	},
-	"dependencies": {
-		"km7dev.gdps-switcher": {
-			"version": ">=1.0.0",
-			"importance": "suggested"
 		}
 	}
 }
