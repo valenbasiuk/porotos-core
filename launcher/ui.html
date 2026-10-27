@@ -1,134 +1,175 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="night">
 <head>
 <meta charset="utf-8">
-<title>Porotos 2 Launcher</title>
+<title>porotos 2</title>
 <style>
   :root {
-    --bg: #14110f;
-    --panel: #201b17;
-    --line: #3a312a;
-    --text: #f3ece4;
-    --muted: #a89a8c;
-    --accent: #e8a33d;
-    --accent-ink: #1c1206;
-    --ok: #7bc47f;
-    --bad: #e06c5a;
+    --wallpaper: url("https://porotoslist.vercel.app/common/wallpaper-noche.jpg");
+    --wallpaper-fallback: linear-gradient(180deg, #05121f 0%, #0d3a4f 60%, #1d6b4c 100%);
+    --frame-bg: linear-gradient(180deg, rgba(172,172,172,.85) 0, rgba(71,71,71,.85) 10px, rgba(19,19,19,.85) 24px, rgba(8,8,8,.8) 46px, rgba(15,15,15,.72) 100%);
+    --frame-border: #4e4e4e;
+    --frame-highlight: rgba(255,255,255,.18);
+    --pane-bg: rgba(39,39,39,.6);
+    --pane-border: #3b3b3b;
+    --side-bg: linear-gradient(180deg, rgba(26,26,26,.8), rgba(22,22,22,.8));
+    --status-bg: linear-gradient(180deg, rgba(40,40,40,.9), rgba(15,15,15,.9));
+    --ink: #e4e4e4;
+    --ink-soft: #a9a9a9;
+    --hdr-bg: linear-gradient(180deg, #fff 0, rgba(129,129,129,.75) 3%, rgba(56,56,56,.75) 50%, rgba(27,27,27,.75) 50%);
+    --col-bg: linear-gradient(180deg, rgba(90,90,90,.5) 0%, rgba(50,50,50,.5) 50%, rgba(20,20,20,.6) 50%, rgba(35,35,35,.6) 100%);
+    --col-border: #111;
+    --group-bg: linear-gradient(180deg, rgba(80,80,80,.2), rgba(39,39,39,.1));
+    --group-border: rgba(236,242,249,.2);
+    --btn-bg: linear-gradient(180deg, rgba(255,255,255,.25) 0, rgba(117,117,117,.15) 20%, rgba(92,92,92,.15) 55%, rgba(0,0,0,.3) 55%, rgba(41,41,41,.3) 100%);
+    --btn-hover-bg: linear-gradient(180deg, rgba(255,255,255,.25) 0, rgba(117,117,117,.2) 20%, rgba(92,92,92,.2) 50%, rgba(43,43,43,.3) 50%, rgba(161,161,161,.3) 100%);
+    --green-bg: linear-gradient(180deg, #ecffe6 0%, #a3ec93 6%, #4cc650 47%, #24962c 53%, #4fd657 100%);
+    --green-hover-bg: linear-gradient(180deg, #f3fff0 0%, #b8f5a9 6%, #5bd65f 47%, #2aa833 53%, #74f07c 100%);
+    --row-line: rgba(255,255,255,.07);
+    --ok: #57fa6f;
+    --bad: #ff7a6b;
+    --font: "Segoe UI", Tahoma, Arial, Helvetica, sans-serif;
+    color-scheme: dark;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
-    font: 14px/1.45 "Segoe UI", system-ui, sans-serif; user-select: none; overflow: hidden; }
-  .wrap { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
-  .side { background: radial-gradient(120% 80% at 20% 10%, #3b2a18 0%, #1a1410 60%); padding: 36px 28px;
-    display: flex; flex-direction: column; border-right: 1px solid var(--line); }
-  .logo { font-size: 44px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
-  .logo span { color: var(--accent); }
-  .tag { margin-top: 8px; color: var(--muted); font-size: 13px; }
-  .rules { margin-top: auto; color: var(--muted); font-size: 12.5px; }
-  .rules b { color: var(--text); font-weight: 600; }
-  .main { padding: 32px 36px; display: flex; flex-direction: column; gap: 18px; min-width: 0; overflow: hidden; }
-  .rows { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; background: var(--panel);
-    border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
-  .rows .k { color: var(--muted); }
-  .rows .v { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  html, body { margin: 0; height: 100%; overflow: hidden; user-select: none; }
+  body { font: 13.5px var(--font); color: var(--ink); text-transform: lowercase;
+    background: var(--wallpaper) center / cover no-repeat, var(--wallpaper-fallback); padding: 10px; }
+  body::after { content: ""; position: fixed; inset: 0; z-index: -1; background: rgba(0,0,0,.25); }
+
+  .win { height: 100%; display: grid; grid-template-rows: auto minmax(0,1fr); padding: 0 7px 7px;
+    border-radius: 7px 7px 5px 5px; background: var(--frame-bg); border: 1px solid var(--frame-border);
+    backdrop-filter: blur(14px) saturate(1.3);
+    box-shadow: inset 0 0 0 1px var(--frame-highlight), 0 12px 32px rgba(0,0,0,.45); }
+  .titlebar { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 4px; }
+  .titlebar img { width: 30px; height: 30px; border-radius: 4px; object-fit: cover; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+  .titlebar h1 { margin: 0; font-size: 19px; font-weight: 400; color: #fff; text-shadow: 0 0 3px #000, 0 1px 2px #000; }
+
+  .pane { display: grid; grid-template-columns: 172px minmax(0,1fr); grid-template-rows: minmax(0,1fr) auto;
+    min-height: 0; border: 1px solid var(--pane-border); border-radius: 2px; background: var(--pane-bg); overflow: hidden; }
+  .side { display: flex; flex-direction: column; gap: 5px; padding: 6px; background: var(--side-bg); border-right: 1px solid var(--pane-border); }
+  .group { display: flex; flex-direction: column; gap: 1px; padding: 1px; border: 1px solid var(--group-border);
+    border-radius: 4px; background: var(--group-bg); box-shadow: 2px 2px 3px rgba(0,0,0,.8); }
+  .gtitle { height: 19px; line-height: 17px; text-align: center; font-size: 12.5px; color: #f7f4f4;
+    background: var(--hdr-bg); border: 1px solid #000; border-radius: 3px; margin-bottom: 1px; }
+
+  .btn { display: flex; align-items: center; gap: 6px; height: 25px; padding: 0 8px; font: inherit; font-size: 12.5px;
+    color: #eee; background: var(--btn-bg); border: 1px solid #0f0f0f; border-radius: 3px; cursor: pointer; white-space: nowrap; }
+  .btn:hover:not(:disabled) { background: var(--btn-hover-bg); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn svg { width: 15px; height: 15px; flex: none; }
+  .btn.green { color: #fff; background: var(--green-bg); border-color: #000; text-shadow: 0 1px 1px rgba(0,50,0,.6); }
+  .btn.green:hover:not(:disabled) { background: var(--green-hover-bg); }
+  .play { height: 38px; justify-content: center; font-size: 15px; margin-top: auto; }
+
+  .main { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .main h2 { margin: 0; font-size: 20px; font-weight: 400; color: #fff; }
+  .table { border: 1px solid #3a3a3a; border-radius: 2px; background: rgba(0,0,0,.2); }
+  .thead, .trow { display: grid; grid-template-columns: 140px minmax(0,1fr); gap: 10px; align-items: center; }
+  .thead { height: 24px; padding: 0 8px; font-size: 12px; color: #cfcfcf; background: var(--col-bg); border-bottom: 1px solid var(--col-border); }
+  .trow { margin: 1px; padding: 4px 7px; min-height: 30px; border: 1px solid transparent; border-radius: 3px; }
+  .trow + .trow { box-shadow: 0 -2px 0 -1px var(--row-line); }
+  .trow .k { color: var(--ink-soft); }
+  .trow .v { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .v.ok { color: var(--ok); } .v.bad { color: var(--bad); }
-  .msg { min-height: 22px; font-size: 13.5px; }
-  .msg.err { color: var(--bad); } .msg.info { color: var(--muted); } .msg.good { color: var(--ok); }
-  .bar { width: 100%; height: 8px; background: #2c251f; border-radius: 99px; overflow: hidden; visibility: hidden; }
-  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width .15s; }
-  .actions { margin-top: auto; display: flex; gap: 10px; align-items: center; }
-  button { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--text);
-    padding: 10px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
-  button:hover:not(:disabled) { border-color: #5a4b3e; }
-  button:disabled { opacity: .45; cursor: default; }
-  #play { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 800;
-    font-size: 16px; padding: 14px 16px; letter-spacing: .5px; flex: 1 1 0; min-width: 0; }
-  #play:hover:not(:disabled) { filter: brightness(1.08); }
-  .banner { display: none; background: #2b2313; border: 1px solid #5c4720; color: #f1d39a; border-radius: 8px;
-    padding: 10px 14px; font-size: 13px; }
-  .banner a { color: var(--accent); cursor: pointer; text-decoration: underline; }
-  .ver { color: #6f6357; font-size: 11.5px; margin-top: 10px; }
+
+  .bar { height: 14px; border: 1px solid #000; border-radius: 3px; background: rgba(0,0,0,.45); overflow: hidden; visibility: hidden; }
+  .bar > div { height: 100%; width: 0; background: var(--green-bg); transition: width .15s; }
+  .msg { min-height: 18px; color: var(--ink-soft); }
+  .msg.err { color: var(--bad); } .msg.good { color: var(--ok); }
+
+  .status { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; height: 23px; padding: 0 8px;
+    font-size: 12px; color: var(--ink-soft); background: var(--status-bg); border-top: 1px solid var(--pane-border); }
+  .status .grow { flex: 1; }
+  .status a { color: #7fd0ff; cursor: pointer; display: none; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <aside class="side">
-    <div class="logo">Porotos<span> 2</span></div>
-    <div class="tag">Geometry Dash Private Server</div>
-    <div class="rules">
-      <p><b>Los niveles main no dan nada acá.</b> Las estrellas, lunas y monedas salen solo de niveles online rateados.</p>
-      <p>Usa tu copia de GD de Steam, en una carpeta aparte y con un save separado. Tu GD normal no se toca.</p>
-      <div class="ver" id="ver"></div>
-    </div>
-  </aside>
-  <main class="main">
-    <div class="banner" id="banner">Hay una versión nueva del launcher (<span id="newver"></span>). <a onclick="openRelease()">Descargar</a></div>
-    <div class="rows">
-      <div class="k">Steam</div><div class="v" id="steam">…</div>
-      <div class="k">Geometry Dash</div><div class="v" id="gd">Buscando…</div>
-      <div class="k">Juego</div><div class="v" id="game">…</div>
-      <div class="k">Geode</div><div class="v" id="geode">…</div>
-      <div class="k">Porotos 2 Core</div><div class="v" id="mod">…</div>
-    </div>
-    <div class="msg info" id="msg">Conectando…</div>
-    <div class="bar" id="bar"><div id="fill"></div></div>
-    <div class="actions">
-      <button id="play" onclick="doPlay()" disabled>JUGAR</button>
-      <button id="reinstall" onclick="doReinstall()" disabled title="Vuelve a copiar el juego desde Steam">Reinstalar</button>
-      <button onclick="openFolder()">Carpeta</button>
-    </div>
-  </main>
+<div class="win">
+  <header class="titlebar">
+    <img src="https://porotoslist.vercel.app/common/logo.png" alt="" onerror="this.style.display='none'">
+    <h1>porotos 2</h1>
+  </header>
+  <div class="pane">
+    <nav class="side">
+      <div class="group">
+        <div class="gtitle">juego</div>
+        <button class="btn" id="reinstall" onclick="doReinstall()" disabled>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg>reinstalar</button>
+        <button class="btn" onclick="openFolder()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1.5 4.5h4l1.5 1.5h7.5v7.5h-13z"/></svg>carpeta</button>
+      </div>
+      <button class="btn green play" id="play" onclick="doPlay()" disabled>jugar</button>
+    </nav>
+    <main class="main">
+      <h2>estado</h2>
+      <div class="table">
+        <div class="trow"><span class="k">steam</span><span class="v" id="steam">…</span></div>
+        <div class="trow"><span class="k">geometry dash</span><span class="v" id="gd">…</span></div>
+        <div class="trow"><span class="k">geode</span><span class="v" id="geode">…</span></div>
+        <div class="trow"><span class="k">porotos core</span><span class="v" id="mod">…</span></div>
+      </div>
+      <div class="bar" id="bar"><div id="fill"></div></div>
+      <div class="msg" id="msg"></div>
+    </main>
+    <footer class="status">
+      <span id="ver"></span>
+      <a id="upd" onclick="openRelease()">launcher nuevo</a>
+      <span class="grow"></span>
+      <span>porotos gdps</span>
+    </footer>
+  </div>
 </div>
 <script>
   const $ = id => document.getElementById(id);
   let st = null, busy = false;
 
-  function setMsg(text, kind) { const m = $('msg'); m.textContent = text || ''; m.className = 'msg ' + (kind || 'info'); }
+  function setMsg(t, kind) { const m = $('msg'); m.textContent = t || ''; m.className = 'msg ' + (kind || ''); }
+  function val(id, t, kind) { const e = $(id); e.textContent = t; e.className = 'v' + (kind ? ' ' + kind : ''); e.title = t; }
   function setBusy(b) {
     busy = b;
     $('play').disabled = b || !st || (!st.gdPath && !st.installed);
     $('reinstall').disabled = b || !st || !st.gdPath;
     if (!b) $('bar').style.visibility = 'hidden';
   }
-  function val(id, text, kind) { const e = $(id); e.textContent = text; e.className = 'v' + (kind ? ' ' + kind : ''); e.title = text; }
+  function ver(cur, latest) {
+    if (cur) return cur + (latest && latest !== cur ? ' → ' + latest : '');
+    return latest ? 'se instala ' + latest : '—';
+  }
 
   function render(s) {
     st = s;
-    $('ver').textContent = 'Launcher ' + s.version;
-    val('steam', s.steamRunning ? 'Abierto' : 'Cerrado (abrilo antes de jugar)', s.steamRunning ? 'ok' : 'bad');
-    val('gd', s.gdPath || 'No encontrado en Steam', s.gdPath ? '' : 'bad');
-    val('game', s.installed ? (s.steamChanged ? 'Instalado (GD de Steam cambió de versión)' : 'Instalado') : 'No instalado', s.installed ? 'ok' : '');
-    val('geode', s.geodeVersion ? s.geodeVersion + (s.latestGeode && s.latestGeode !== s.geodeVersion ? '  →  ' + s.latestGeode : '') : (s.latestGeode ? 'Se instala ' + s.latestGeode : '—'));
-    val('mod', s.modVersion ? s.modVersion + (s.latestMod && s.latestMod !== s.modVersion ? '  →  ' + s.latestMod : '') : (s.latestMod ? 'Se instala ' + s.latestMod : '—'));
-    $('play').textContent = s.installed ? (s.needsUpdate ? 'ACTUALIZAR Y JUGAR' : 'JUGAR') : 'INSTALAR Y JUGAR';
-    if (s.launcherUpdate) { $('newver').textContent = s.launcherUpdate; $('banner').style.display = 'block'; }
+    $('ver').textContent = 'launcher ' + s.version;
+    $('upd').style.display = s.launcherUpdate ? 'inline' : 'none';
+    val('steam', s.steamRunning ? 'abierto' : 'cerrado', s.steamRunning ? 'ok' : 'bad');
+    val('gd', s.gdPath ? (s.installed ? (s.steamChanged ? 'instalado (steam cambió de versión)' : 'instalado') : 'listo para instalar') : 'no está en steam', s.gdPath || s.installed ? 'ok' : 'bad');
+    val('geode', ver(s.geodeVersion, s.latestGeode));
+    val('mod', ver(s.modVersion, s.latestMod));
+    $('play').textContent = s.installed ? (s.needsUpdate ? 'actualizar' : 'jugar') : 'instalar';
     if (!busy) {
       if (s.error) setMsg(s.error, 'err');
-      else if (s.offline && !s.installed) setMsg('No hay conexión con GitHub. Revisá tu internet.', 'err');
-      else if (s.offline) setMsg('Sin conexión: se juega con lo que ya está instalado.', 'info');
-      else if (s.steamChanged) setMsg('Steam actualizó GD. Porotos 2 sigue con la versión anterior hasta que toques "Reinstalar juego".', 'info');
-      else setMsg(s.installed ? 'Todo listo.' : 'La primera vez copia el juego (unos cientos de MB).', 'info');
+      else if (s.offline && !s.installed) setMsg('sin conexión', 'err');
+      else setMsg('');
     }
     setBusy(s.busy);
   }
 
-  function fmt(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+  function size(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' mb' : Math.max(1, Math.round(n / 1024)) + ' kb'; }
 
   window.onEvent = function (ev, p) {
     if (ev === 'status') render(p);
     else if (ev === 'progress') {
       $('bar').style.visibility = 'visible';
-      const pct = p.total > 0 ? Math.min(100, p.done / p.total * 100) : 0;
-      $('fill').style.width = pct + '%';
-      setMsg(p.stage + (p.total > 0 ? '  ·  ' + fmt(p.done) + ' / ' + fmt(p.total) : ''), 'info');
+      $('fill').style.width = (p.total > 0 ? Math.min(100, p.done / p.total * 100) : 0) + '%';
+      setMsg(p.stage + (p.total > 0 ? ' · ' + size(p.done) + ' / ' + size(p.total) : ''));
     }
     else if (ev === 'error') { setBusy(false); setMsg(p, 'err'); }
-    else if (ev === 'done') { setMsg('Listo.', 'good'); }
-    else if (ev === 'launched') { setBusy(false); setMsg('Abriendo Porotos 2…', 'good'); closeLauncher(); }
+    else if (ev === 'done') setMsg('listo', 'good');
+    else if (ev === 'launched') { setBusy(false); setMsg('abriendo…', 'good'); closeLauncher(); }
   };
 
-  function doPlay() { if (busy) return; setBusy(true); setMsg('Preparando…'); play(); }
-  function doReinstall() { if (busy) return; setBusy(true); setMsg('Copiando el juego desde Steam…'); install(true); }
+  function doPlay() { if (busy) return; setBusy(true); setMsg('preparando…'); play(); }
+  function doReinstall() { if (busy) return; setBusy(true); setMsg('copiando…'); install(true); }
 
   refresh();
   setInterval(() => { if (!busy) refreshLocal(); }, 5000);

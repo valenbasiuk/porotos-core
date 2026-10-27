@@ -31,7 +31,7 @@ func main() {
 		AutoFocus: true,
 		DataPath:  filepath.Join(paths.Data, "webview"),
 		WindowOptions: webview2.WindowOptions{
-			Title:  "Porotos 2 Launcher",
+			Title:  "porotos 2",
 			Width:  780,
 			Height: 500,
 			Center: true,
