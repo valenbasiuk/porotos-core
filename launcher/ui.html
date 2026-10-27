@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Porotos 2 Launcher</title>
+<style>
+  :root {
+    --bg: #14110f;
+    --panel: #201b17;
+    --line: #3a312a;
+    --text: #f3ece4;
+    --muted: #a89a8c;
+    --accent: #e8a33d;
+    --accent-ink: #1c1206;
+    --ok: #7bc47f;
+    --bad: #e06c5a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 14px/1.45 "Segoe UI", system-ui, sans-serif; user-select: none; overflow: hidden; }
+  .wrap { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
+  .side { background: radial-gradient(120% 80% at 20% 10%, #3b2a18 0%, #1a1410 60%); padding: 36px 28px;
+    display: flex; flex-direction: column; border-right: 1px solid var(--line); }
+  .logo { font-size: 44px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+  .logo span { color: var(--accent); }
+  .tag { margin-top: 8px; color: var(--muted); font-size: 13px; }
+  .rules { margin-top: auto; color: var(--muted); font-size: 12.5px; }
+  .rules b { color: var(--text); font-weight: 600; }
+  .main { padding: 32px 36px; display: flex; flex-direction: column; gap: 18px; min-width: 0; overflow: hidden; }
+  .rows { display: grid; grid-template-columns: 120px 1fr; gap: 8px 14px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .rows .k { color: var(--muted); }
+  .rows .v { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .v.ok { color: var(--ok); } .v.bad { color: var(--bad); }
+  .msg { min-height: 22px; font-size: 13.5px; }
+  .msg.err { color: var(--bad); } .msg.info { color: var(--muted); } .msg.good { color: var(--ok); }
+  .bar { width: 100%; height: 8px; background: #2c251f; border-radius: 99px; overflow: hidden; visibility: hidden; }
+  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width .15s; }
+  .actions { margin-top: auto; display: flex; gap: 10px; align-items: center; }
+  button { font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    padding: 10px 14px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+  button:hover:not(:disabled) { border-color: #5a4b3e; }
+  button:disabled { opacity: .45; cursor: default; }
+  #play { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 800;
+    font-size: 16px; padding: 14px 16px; letter-spacing: .5px; flex: 1 1 0; min-width: 0; }
+  #play:hover:not(:disabled) { filter: brightness(1.08); }
+  .banner { display: none; background: #2b2313; border: 1px solid #5c4720; color: #f1d39a; border-radius: 8px;
+    padding: 10px 14px; font-size: 13px; }
+  .banner a { color: var(--accent); cursor: pointer; text-decoration: underline; }
+  .ver { color: #6f6357; font-size: 11.5px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side">
+    <div class="logo">Porotos<span> 2</span></div>
+    <div class="tag">Geometry Dash Private Server</div>
+    <div class="rules">
+      <p><b>Los niveles main no dan nada acá.</b> Las estrellas, lunas y monedas salen solo de niveles online rateados.</p>
+      <p>Usa tu copia de GD de Steam, en una carpeta aparte y con un save separado. Tu GD normal no se toca.</p>
+      <div class="ver" id="ver"></div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="banner" id="banner">Hay una versión nueva del launcher (<span id="newver"></span>). <a onclick="openRelease()">Descargar</a></div>
+    <div class="rows">
+      <div class="k">Steam</div><div class="v" id="steam">…</div>
+      <div class="k">Geometry Dash</div><div class="v" id="gd">Buscando…</div>
+      <div class="k">Juego</div><div class="v" id="game">…</div>
+      <div class="k">Geode</div><div class="v" id="geode">…</div>
+      <div class="k">Porotos 2 Core</div><div class="v" id="mod">…</div>
+    </div>
+    <div class="msg info" id="msg">Conectando…</div>
+    <div class="bar" id="bar"><div id="fill"></div></div>
+    <div class="actions">
+      <button id="play" onclick="doPlay()" disabled>JUGAR</button>
+      <button id="reinstall" onclick="doReinstall()" disabled title="Vuelve a copiar el juego desde Steam">Reinstalar</button>
+      <button onclick="openFolder()">Carpeta</button>
+    </div>
+  </main>
+</div>
+<script>
+  const $ = id => document.getElementById(id);
+  let st = null, busy = false;
+
+  function setMsg(text, kind) { const m = $('msg'); m.textContent = text || ''; m.className = 'msg ' + (kind || 'info'); }
+  function setBusy(b) {
+    busy = b;
+    $('play').disabled = b || !st || (!st.gdPath && !st.installed);
+    $('reinstall').disabled = b || !st || !st.gdPath;
+    if (!b) $('bar').style.visibility = 'hidden';
+  }
+  function val(id, text, kind) { const e = $(id); e.textContent = text; e.className = 'v' + (kind ? ' ' + kind : ''); e.title = text; }
+
+  function render(s) {
+    st = s;
+    $('ver').textContent = 'Launcher ' + s.version;
+    val('steam', s.steamRunning ? 'Abierto' : 'Cerrado (abrilo antes de jugar)', s.steamRunning ? 'ok' : 'bad');
+    val('gd', s.gdPath || 'No encontrado en Steam', s.gdPath ? '' : 'bad');
+    val('game', s.installed ? (s.steamChanged ? 'Instalado (GD de Steam cambió de versión)' : 'Instalado') : 'No instalado', s.installed ? 'ok' : '');
+    val('geode', s.geodeVersion ? s.geodeVersion + (s.latestGeode && s.latestGeode !== s.geodeVersion ? '  →  ' + s.latestGeode : '') : (s.latestGeode ? 'Se instala ' + s.latestGeode : '—'));
+    val('mod', s.modVersion ? s.modVersion + (s.latestMod && s.latestMod !== s.modVersion ? '  →  ' + s.latestMod : '') : (s.latestMod ? 'Se instala ' + s.latestMod : '—'));
+    $('play').textContent = s.installed ? (s.needsUpdate ? 'ACTUALIZAR Y JUGAR' : 'JUGAR') : 'INSTALAR Y JUGAR';
+    if (s.launcherUpdate) { $('newver').textContent = s.launcherUpdate; $('banner').style.display = 'block'; }
+    if (!busy) {
+      if (s.error) setMsg(s.error, 'err');
+      else if (s.offline && !s.installed) setMsg('No hay conexión con GitHub. Revisá tu internet.', 'err');
+      else if (s.offline) setMsg('Sin conexión: se juega con lo que ya está instalado.', 'info');
+      else if (s.steamChanged) setMsg('Steam actualizó GD. Porotos 2 sigue con la versión anterior hasta que toques "Reinstalar juego".', 'info');
+      else setMsg(s.installed ? 'Todo listo.' : 'La primera vez copia el juego (unos cientos de MB).', 'info');
+    }
+    setBusy(s.busy);
+  }
+
+  function fmt(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+
+  window.onEvent = function (ev, p) {
+    if (ev === 'status') render(p);
+    else if (ev === 'progress') {
+      $('bar').style.visibility = 'visible';
+      const pct = p.total > 0 ? Math.min(100, p.done / p.total * 100) : 0;
+      $('fill').style.width = pct + '%';
+      setMsg(p.stage + (p.total > 0 ? '  ·  ' + fmt(p.done) + ' / ' + fmt(p.total) : ''), 'info');
+    }
+    else if (ev === 'error') { setBusy(false); setMsg(p, 'err'); }
+    else if (ev === 'done') { setMsg('Listo.', 'good'); }
+    else if (ev === 'launched') { setBusy(false); setMsg('Abriendo Porotos 2…', 'good'); closeLauncher(); }
+  };
+
+  function doPlay() { if (busy) return; setBusy(true); setMsg('Preparando…'); play(); }
+  function doReinstall() { if (busy) return; setBusy(true); setMsg('Copiando el juego desde Steam…'); install(true); }
+
+  refresh();
+  setInterval(() => { if (!busy) refreshLocal(); }, 5000);
+  setInterval(() => { if (!busy) refresh(); }, 10 * 60 * 1000);
+</script>
+</body>
+</html>
